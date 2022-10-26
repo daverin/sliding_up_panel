@@ -159,6 +159,9 @@ class SlidingUpPanel extends StatefulWidget {
   /// by default the Panel is open and must be swiped closed by the user.
   final PanelState defaultPanelState;
 
+  final double minFlingVelocity;
+  final double kSnap;
+
   SlidingUpPanel(
       {Key? key,
       this.panel,
@@ -194,6 +197,8 @@ class SlidingUpPanel extends StatefulWidget {
       this.isDraggable = true,
       this.slideDirection = SlideDirection.UP,
       this.defaultPanelState = PanelState.CLOSED,
+      this.minFlingVelocity = 365.0,
+      this.kSnap = 2,
       this.header,
       this.footer})
       : assert(panel != null || panelBuilder != null),
@@ -491,9 +496,6 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
 
   // handles when user stops sliding
   void _onGestureEnd(Velocity v) {
-    double minFlingVelocity = 365.0;
-    double kSnap = 8;
-
     //let the current animation finish before starting a new one
     if (_ac.isAnimating) return;
 
@@ -517,15 +519,16 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
     double minDistance = min(d2Close, min(d2Snap, d2Open));
 
     // check if velocity is sufficient for a fling
-    if (v.pixelsPerSecond.dy.abs() >= minFlingVelocity) {
+    if (v.pixelsPerSecond.dy.abs() >= widget.minFlingVelocity) {
       // snapPoint exists
       if (widget.panelSnapping && widget.snapPoint != null) {
-        if (v.pixelsPerSecond.dy.abs() >= kSnap * minFlingVelocity ||
-            minDistance == d2Snap)
+        if (v.pixelsPerSecond.dy.abs() >=
+                widget.kSnap * widget.minFlingVelocity ||
+            minDistance == d2Snap) {
           _ac.fling(velocity: visualVelocity);
-        else
+        } else {
           _flingPanelToPosition(widget.snapPoint!, visualVelocity);
-
+        }
         // no snap point exists
       } else if (widget.panelSnapping) {
         _ac.fling(velocity: visualVelocity);
