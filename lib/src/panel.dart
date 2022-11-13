@@ -161,6 +161,7 @@ class SlidingUpPanel extends StatefulWidget {
 
   final double minFlingVelocity;
   final double kSnap;
+  final bool enableSliding;
 
   SlidingUpPanel(
       {Key? key,
@@ -171,6 +172,7 @@ class SlidingUpPanel extends StatefulWidget {
       this.minHeight = 100.0,
       this.maxHeight = 500.0,
       this.snapPoint,
+      this.enableSliding = true,
       this.border,
       this.borderRadius,
       this.boxShadow = const <BoxShadow>[
@@ -473,11 +475,13 @@ class _SlidingUpPanelState extends State<SlidingUpPanel>
   // handles the sliding gesture
   void _onGestureSlide(double dy) {
     // only slide the panel if scrolling is not enabled
-    if (!_scrollingEnabled) {
-      if (widget.slideDirection == SlideDirection.UP)
-        _ac.value -= dy / (widget.maxHeight - widget.minHeight);
-      else
-        _ac.value += dy / (widget.maxHeight - widget.minHeight);
+    if (widget.enableSliding) {
+      if (!_scrollingEnabled) {
+        if (widget.slideDirection == SlideDirection.UP)
+          _ac.value -= dy / (widget.maxHeight - widget.minHeight);
+        else
+          _ac.value += dy / (widget.maxHeight - widget.minHeight);
+      }
     }
 
     // if the panel is open and the user hasn't scrolled, we need to determine
